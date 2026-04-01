@@ -18,7 +18,7 @@ const chemicalCategories = [
     products: [
       { name: "LDPE Shrink", image: "/images/LDPE-shrink.jpg" },
       { name: "LLDPE", image: "/images/LLDPE.jpg" },
-      { name: "HDPE Film", image: "/images/HDPE-film.jpg" },
+      { name: "HDPE Film", image: "/images/HDPE film.jpg" },
     ],
   },
   {
@@ -26,7 +26,7 @@ const chemicalCategories = [
     products: [
       { name: "LLDPE", image: "/images/LLDPE.jpg" },
       { name: "LDPE (2/4 MFI)", image: "/images/LDPE-shrink.jpg" },
-      { name: "HDPE Film", image: "/images/HDPE-film.jpg" },
+      { name: "HDPE Film", image: "/images/HDPE film.jpg" },
       { name: "PET Resin", image: "/images/PET-resin.jpg" },
     ],
   },
@@ -41,7 +41,7 @@ const chemicalCategories = [
   {
     title: "🏭 Industrial Manufacturing",
     products: [
-      { name: "HDPE Blow", image: "/images/HDPE-film.jpg" },
+      { name: "HDPE Blow", image: "/images/HDPE film.jpg" },
       { name: "PVC Resin", image: "/images/PET-resin.jpg" },
       { name: "Metallocene", image: "/images/PET-Preforms.jpg" },
       { name: "LLDPE", image: "/images/LLDPE.jpg" },
