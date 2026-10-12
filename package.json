@@ -1,0 +1,19 @@
+{
+  "name": "rr-group-website",
+  "version": "1.0.0",
+  "description": "RR Group of Companies - static corporate website covering plastics, paper products and frozen fish.",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "serve . -l 3000",
+    "dev": "serve . -l 3000",
+    "preview": "serve . -l 4173",
+    "build": "echo \"Static site - no build step. Deploy the project root as-is.\""
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
