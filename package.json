@@ -6,14 +6,12 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "serve . -l 3000",
-    "dev": "serve . -l 3000",
-    "preview": "serve . -l 4173",
-    "build": "echo \"Static site - no build step. Deploy the project root as-is.\""
+    "dev": "serve . -l 3000"
   },
   "devDependencies": {
     "serve": "^14.2.4"
   },
   "engines": {
-    "node": ">=18"
+    "node": "22.x"
   }
 }
