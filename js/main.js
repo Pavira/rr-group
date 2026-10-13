@@ -59,8 +59,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* ---------- Tabs (industries served sections) ---------- */
   document.querySelectorAll('[data-tabs]').forEach((tabGroup) => {
-    const buttons = tabGroup.querySelectorAll('.tab-btn');
-    const panels = tabGroup.querySelectorAll('.tab-panel');
+    const buttons = tabGroup.querySelectorAll('.tab-btn, .industry-tab');
+    const panels = tabGroup.querySelectorAll('.tab-panel, .industry-panel');
     buttons.forEach((btn) => {
       btn.addEventListener('click', () => {
         const target = btn.getAttribute('data-tab-target');
@@ -69,6 +69,14 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.classList.add('active');
         const panel = tabGroup.querySelector('[data-tab-panel="' + target + '"]');
         if (panel) panel.classList.add('active');
+        if (btn.getAttribute('role') === 'tab') {
+          buttons.forEach((b) => {
+            b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+          });
+          panels.forEach((p) => {
+            p.setAttribute('aria-hidden', p === panel ? 'false' : 'true');
+          });
+        }
       });
     });
   });
