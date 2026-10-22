@@ -1,125 +1,101 @@
-// ============================================================
-// RR GROUP OF COMPANIES — Shared Interactivity
-// ============================================================
+/* RR Group - shared scripts (menu, slideshows, showcase, tabs, strip, reveal, sub-nav, form) */
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
 
-document.addEventListener('DOMContentLoaded', function () {
+  $$('[data-year]').forEach(function (el) { el.textContent = new Date().getFullYear(); });
 
-  /* ---------- Navbar scroll + mobile toggle + dropdown ---------- */
-  const navbar = document.querySelector('.navbar');
-  if (navbar) {
-    const onScroll = () => {
-      if (window.scrollY > 20) navbar.classList.add('scrolled');
-      else navbar.classList.remove('scrolled');
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll);
-  }
-
-  const toggleBtn = document.querySelector('.navbar-toggle');
-  const mobileMenu = document.querySelector('.navbar-mobile');
-  if (toggleBtn && mobileMenu) {
-    toggleBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('open');
-      const isOpen = mobileMenu.classList.contains('open');
-      toggleBtn.innerHTML = isOpen
-        ? '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
-        : '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
-    });
-    mobileMenu.querySelectorAll('a').forEach((a) => {
-      a.addEventListener('click', () => mobileMenu.classList.remove('open'));
-    });
-  }
-
-  const dropdown = document.querySelector('.nav-dropdown');
-  if (dropdown) {
-    dropdown.addEventListener('mouseenter', () => dropdown.classList.add('open'));
-    dropdown.addEventListener('mouseleave', () => dropdown.classList.remove('open'));
-  }
-
-  /* ---------- Generic hero slideshow (used by home + inner-page heroes) ---------- */
-  document.querySelectorAll('[data-slideshow]').forEach((wrapper) => {
-    const slides = wrapper.querySelectorAll('.hero-slide, .page-hero-slide');
-    const dots = wrapper.querySelectorAll('.hero-indicators button');
-    if (slides.length <= 1) return;
-    let current = 0;
-    const interval = parseInt(wrapper.getAttribute('data-interval') || '4000', 10);
-
-    const show = (idx) => {
-      slides.forEach((s, i) => s.classList.toggle('active', i === idx));
-      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
-      current = idx;
-    };
-
-    dots.forEach((dot, i) => dot.addEventListener('click', () => show(i)));
-
-    setInterval(() => {
-      show((current + 1) % slides.length);
-    }, interval);
+  /* menu */
+  var burger = $('#burger'), mnav = $('#mnav');
+  if (burger && mnav) burger.addEventListener('click', function () { mnav.classList.toggle('open'); });
+  document.addEventListener('click', function (e) {
+    var dd = e.target.closest('[data-dd]');
+    if (dd) dd.parentNode.classList.toggle('open');
+    else if (!e.target.closest('.has-dd')) $$('.has-dd').forEach(function (x) { x.classList.remove('open'); });
+    if (e.target.closest('[data-top]')) window.scrollTo({ top: 0, behavior: 'smooth' });
+    var g = e.target.closest('[data-goto]');
+    if (g) { var el = document.getElementById(g.getAttribute('data-goto')); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   });
 
-  /* ---------- Tabs (industries served sections) ---------- */
-  document.querySelectorAll('[data-tabs]').forEach((tabGroup) => {
-    const buttons = tabGroup.querySelectorAll('.tab-btn, .industry-tab');
-    const panels = tabGroup.querySelectorAll('.tab-panel, .industry-panel');
-    buttons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const target = btn.getAttribute('data-tab-target');
-        buttons.forEach((b) => b.classList.remove('active'));
-        panels.forEach((p) => p.classList.remove('active'));
-        btn.classList.add('active');
-        const panel = tabGroup.querySelector('[data-tab-panel="' + target + '"]');
-        if (panel) panel.classList.add('active');
-        if (btn.getAttribute('role') === 'tab') {
-          buttons.forEach((b) => {
-            b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
-          });
-          panels.forEach((p) => {
-            p.setAttribute('aria-hidden', p === panel ? 'false' : 'true');
-          });
-        }
+  /* slideshows: [data-slideshow] > (.s | img), optional .dots button + .capt */
+  $$('[data-slideshow]').forEach(function (box) {
+    var items = $$('.s', box); if (!items.length) items = $$('img', box);
+    if (items.length < 2) return;
+    var dots = $$('.dots button', box), cap = $('.capt', box), i = 0, t;
+    var ms = parseInt(box.getAttribute('data-interval'), 10) || 5000;
+    function go(n) {
+      i = (n + items.length) % items.length;
+      items.forEach(function (x, k) { x.classList.toggle('on', k === i); });
+      dots.forEach(function (x, k) { x.classList.toggle('on', k === i); });
+      if (cap && items[i].getAttribute('data-cap')) cap.textContent = items[i].getAttribute('data-cap');
+    }
+    function reset() { clearInterval(t); t = setInterval(function () { go(i + 1); }, ms); }
+    dots.forEach(function (b, k) { b.addEventListener('click', function () { go(k); reset(); }); });
+    reset();
+  });
+
+  /* company showcase (home) */
+  $$('[data-showcase]').forEach(function (box) {
+    var it = $$('.sc-item', box), pn = $$('.sc-panel', box);
+    function on(n) {
+      it.forEach(function (x, k) { x.classList.toggle('on', k === n); });
+      pn.forEach(function (x, k) { x.classList.toggle('on', k === n); });
+    }
+    it.forEach(function (b, k) {
+      b.addEventListener('click', function () { on(k); });
+      b.addEventListener('mouseenter', function () { if (window.matchMedia('(hover:hover)').matches) on(k); });
+    });
+  });
+
+  /* milestones strip (home) */
+  $$('[data-strip]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var box = $('[data-strip-box]');
+      if (box) box.scrollBy({ left: parseInt(b.getAttribute('data-strip'), 10) * 260, behavior: 'smooth' });
+    });
+  });
+
+  /* product tabs (company pages) */
+  $$('[data-tabs]').forEach(function (group) {
+    var buttons = $$('.vt-b', group), panels = $$('.vt-p', group);
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var target = btn.getAttribute('data-tab-target');
+        buttons.forEach(function (b) { var on = b === btn; b.classList.toggle('on', on); b.classList.toggle('active', on); });
+        panels.forEach(function (p) { var on = p.getAttribute('data-tab-panel') === target; p.classList.toggle('on', on); p.classList.toggle('active', on); });
       });
     });
   });
 
-  /* ---------- Contact form (static — no backend) ---------- */
-  const contactForm = document.querySelector('#contact-form');
-  if (contactForm) {
-    contactForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      const note = contactForm.querySelector('.form-note');
-      const name = contactForm.querySelector('#name');
-      const subject = encodeURIComponent(contactForm.querySelector('#subject') ? contactForm.querySelector('#subject').value : 'Website Enquiry');
-      const body = encodeURIComponent(
-        'Name: ' + (name ? name.value : '') +
-        '\nEmail: ' + (contactForm.querySelector('#email') ? contactForm.querySelector('#email').value : '') +
-        '\nPhone: ' + (contactForm.querySelector('#phone') ? contactForm.querySelector('#phone').value : '') +
-        '\n\n' + (contactForm.querySelector('#message') ? contactForm.querySelector('#message').value : '')
-      );
-      if (note) note.textContent = 'Thank you! Opening your email client to send the message…';
-      window.location.href = 'mailto:contact@rrgroup.com?subject=' + subject + '&body=' + body;
-      contactForm.reset();
-    });
+  /* reveal on scroll */
+  var items = $$('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (en) {
+      en.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } });
+    }, { threshold: 0.08 });
+    items.forEach(function (x) { io.observe(x); });
+  } else { items.forEach(function (x) { x.classList.add('in'); }); }
+
+  /* sub-nav scroll spy */
+  var links = $$('.subnav a');
+  if (links.length) {
+    var secs = $$('[data-sec]');
+    var spy = function () {
+      var idx = 0;
+      secs.forEach(function (s, k) { if (s.getBoundingClientRect().top < 160) idx = k; });
+      links.forEach(function (a, k) { a.classList.toggle('on', k === idx); });
+    };
+    window.addEventListener('scroll', spy, { passive: true }); spy();
   }
 
-  /* ---------- Reveal-on-scroll ---------- */
-  const revealEls = document.querySelectorAll('.reveal');
-  if ('IntersectionObserver' in window && revealEls.length) {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('in-view');
-          io.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12 });
-    revealEls.forEach((el) => io.observe(el));
-  } else {
-    revealEls.forEach((el) => el.classList.add('in-view'));
-  }
-
-  /* ---------- Footer year ---------- */
-  document.querySelectorAll('[data-year]').forEach((el) => {
-    el.textContent = new Date().getFullYear();
+  /* contact form -> mail client */
+  var f = $('#contact-form');
+  if (f) f.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var g = function (i) { var x = $('#' + i, f); return x ? x.value : ''; };
+    var subject = encodeURIComponent(g('subject') || 'Website Enquiry');
+    var body = encodeURIComponent('Name: ' + g('name') + '\nEmail: ' + g('email') + '\nPhone: ' + g('phone') + '\n\n' + g('message'));
+    var n = $('.fnote', f); if (n) n.textContent = 'Thank you! Opening your email client to send the message\u2026';
+    window.location.href = 'mailto:contact@rrgroup.com?subject=' + subject + '&body=' + body; f.reset();
   });
-
-});
+})();
